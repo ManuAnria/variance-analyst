@@ -1,0 +1,49 @@
+cuenta,nombre,grupo,naturaleza,epigrafe_pyg,orden_pyg
+100,Capital social,1,PN,,
+112,Reserva legal,1,PN,,
+113,Reservas voluntarias,1,PN,,
+129,Resultado del ejercicio,1,PN,,
+170,Deudas a largo plazo con entidades de crédito,1,P,,
+213,Maquinaria,2,A,,
+216,Mobiliario,2,A,,
+217,Equipos para procesos de información,2,A,,
+218,Elementos de transporte,2,A,,
+2813,Amortización acumulada de maquinaria,2,A,,
+2816,Amortización acumulada de mobiliario,2,A,,
+2817,Amortización acumulada de equipos informáticos,2,A,,
+2818,Amortización acumulada de elementos de transporte,2,A,,
+300,Mercaderías,3,A,,
+400,Proveedores,4,P,,
+410,Acreedores por prestaciones de servicios,4,P,,
+430,Clientes,4,A,,
+465,Remuneraciones pendientes de pago,4,P,,
+4700,"Hacienda Pública, deudora por IVA",4,A,,
+472,"Hacienda Pública, IVA soportado",4,A,,
+4750,"Hacienda Pública, acreedora por IVA",4,P,,
+4751,"Hacienda Pública, acreedora por retenciones practicadas",4,P,,
+4752,"Hacienda Pública, acreedora por impuesto sobre sociedades",4,P,,
+476,"Organismos de la Seguridad Social, acreedores",4,P,,
+477,"Hacienda Pública, IVA repercutido",4,P,,
+480,Gastos anticipados,4,A,,
+520,Deudas a corto plazo con entidades de crédito,5,P,,
+523,Proveedores de inmovilizado a corto plazo,5,P,,
+5201,Deudas a corto plazo por crédito dispuesto,5,P,,
+572,"Bancos e instituciones de crédito c/c vista, euros",5,A,,
+600,Compras de mercaderías,6,G,4. Aprovisionamientos,4
+610,Variación de existencias de mercaderías,6,G,4. Aprovisionamientos,4
+621,Arrendamientos y cánones,6,G,7. Otros gastos de explotación,7
+622,Reparaciones y conservación,6,G,7. Otros gastos de explotación,7
+623,Servicios de profesionales independientes,6,G,7. Otros gastos de explotación,7
+624,Transportes,6,G,7. Otros gastos de explotación,7
+625,Primas de seguros,6,G,7. Otros gastos de explotación,7
+626,Servicios bancarios y similares,6,G,7. Otros gastos de explotación,7
+627,"Publicidad, propaganda y relaciones públicas",6,G,7. Otros gastos de explotación,7
+628,Suministros,6,G,7. Otros gastos de explotación,7
+629,Otros servicios,6,G,7. Otros gastos de explotación,7
+631,Otros tributos,6,G,7. Otros gastos de explotación,7
+640,Sueldos y salarios,6,G,6. Gastos de personal,6
+642,Seguridad Social a cargo de la empresa,6,G,6. Gastos de personal,6
+662,Intereses de deudas,6,G,13. Gastos financieros,13
+681,Amortización del inmovilizado material,6,G,8. Amortización del inmovilizado,8
+630,Impuesto sobre beneficios,6,G,17. Impuestos sobre beneficios,17
+700,Ventas de mercaderías,7,I,1. Importe neto de la cifra de negocios,1

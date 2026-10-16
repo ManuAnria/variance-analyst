@@ -1,0 +1,21 @@
+proveedor_id,nombre,pais,nif,tipo,regimen_iva,actividad,cuenta,dias_pago,categoria
+P01,Papierwerke Rhein GmbH,DE,DE888335657,MERCADERIAS,ADQ_INTRACOM,Fabricante de papel y cuadernos,400,30,PAP
+P02,Papeles Industriales Segre S.L.,ES,B30488944,MERCADERIAS,INTERIOR,Fabricante de papel,400,60,PAP
+P03,Scrittura Lombarda S.r.l.,IT,IT89993949811,MERCADERIAS,ADQ_INTRACOM,Fabricante de material de escritura,400,30,ESC
+P04,Ningbo Bright Stationery Co. Ltd,CN,CN-9133627757552516,MERCADERIAS,IMPORTACION,Fabricante de material escolar,400,15,ESC
+P05,Manualidades Ebro S.L.,ES,B50717719,MERCADERIAS,INTERIOR,Material de manualidades,400,60,ESC
+P06,Ofiarchivo Levante S.L.,ES,B08644023,MERCADERIAS,INTERIOR,Material de oficina y archivo,400,60,OFI
+P07,TecnoMayor Iberia S.L.,ES,B12623435,MERCADERIAS,ISP_INTERIOR,"Mayorista de tablets, portátiles y smartphones",400,45,TEC
+P08,Consumibles Atlántico S.L.,ES,B25355629,MERCADERIAS,INTERIOR,"Tóner, cartuchos y calculadoras",400,60,TEC
+P09,Editorial Didáctica Meseta S.A.,ES,A17378738,MERCADERIAS,INTERIOR,Editorial de libros de texto,400,60,LIB
+A01,Inmobiliaria Polígono Sur S.L.,ES,B28535847,ACREEDOR,INTERIOR,Arrendamiento de nave industrial,410,0,
+A02,Transportes Rápidos Delta S.L.,ES,B08394280,ACREEDOR,INTERIOR,Transporte y paquetería,410,30,
+A03,Aseguradora Norte Seguros S.A.,ES,A43309830,ACREEDOR,EXENTO,Seguros (exento art. 20.Uno.16º LIVA),410,0,
+A04,Energía Mediterránea S.A.,ES,A46299129,ACREEDOR,INTERIOR,Suministro eléctrico,410,0,
+A05,Conecta Telecom S.A.,ES,A30238281,ACREEDOR,INTERIOR,Telecomunicaciones,410,0,
+A06,Laura Pérez Ruiz (asesora fiscal y laboral),ES,69141083X,ACREEDOR,INTERIOR,"Asesoría fiscal y laboral (profesional, retención 15 %)",410,15,
+A07,Mantenimientos Industriales Garraf S.L.,ES,B17015942,ACREEDOR,INTERIOR,Mantenimiento de carretillas y almacén,410,30,
+A08,Impulso Creativo S.L.,ES,B17014432,ACREEDOR,INTERIOR,Agencia de publicidad,410,30,
+A09,Restaurante Casa Ferran S.L.,ES,B12229555,ACREEDOR,INTERIOR,Restauración (comidas con clientes),410,0,
+A10,Aduanas y Tránsitos Port S.L.,ES,B03157039,ACREEDOR,INTERIOR,Transitario y representante aduanero,410,15,
+A11,Sistemas Informáticos Garbí S.L.,ES,B25593062,INMOVILIZADO,INTERIOR,Venta de equipos informáticos,523,30,

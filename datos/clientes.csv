@@ -1,0 +1,46 @@
+cliente_id,nombre,tipo,pais,nif,nif_iva,descuento,dias_pago
+C001,Papelerías Mediterráneo S.A.,Cadena de papelerías,ES,A08363871,,0.12,90
+C002,Grupo Escolar Levante S.L.,Cadena de papelerías,ES,B50186022,,0.1,90
+C003,Colegio Murcia Vidal S.Coop.,Centro educativo,ES,F08292161,,0.081,30
+C004,Papelería Vidal S.L.,Papelería,ES,B30694566,,0.085,60
+C005,Papelería Riera S.L.,Papelería,ES,B17129271,,0.09,60
+C006,Librería Vidal Huesca S.L.,Librería,ES,B50992759,,0.071,60
+C007,Librería Prat Mataró S.L.,Librería,ES,B17417304,,0.08,60
+C008,Marín Consultores Vilanova S.L.,Empresa (oficinas),ES,B28306637,,0.06,60
+C009,Papelería Romero S.L.,Papelería,ES,B43040955,,0.056,60
+C010,Librería Llobet Gandia S.L.,Librería,ES,B28873735,,0.035,60
+C011,Librería Vidal Mataró S.L.,Librería,ES,B25824350,,0.044,60
+C012,Papelería Llobet S.L.,Papelería,ES,B46802468,,0.05,60
+C013,Papelería Valls S.L.,Papelería,ES,B12654117,,0.043,60
+C014,Colegio Alacant Roca S.Coop.,Centro educativo,ES,F08163610,,0.024,30
+C015,Soler Consultores Murcia S.L.,Empresa (oficinas),ES,B08522666,,0.025,60
+C016,Papelería Molina S.L.,Papelería,ES,B17167859,,0.022,60
+C017,Serra Consultores Girona S.L.,Empresa (oficinas),ES,B25300591,,0.027,60
+C018,Riera Consultores Mataró S.L.,Empresa (oficinas),ES,B43213453,,0.04,60
+C019,Colegio Murcia Ferrer S.Coop.,Centro educativo,ES,F30821383,,0.022,30
+C020,Prat Consultores Zaragoza S.L.,Empresa (oficinas),ES,B25819723,,0.015,60
+C021,Colegio Tarragona Prat S.Coop.,Centro educativo,ES,F25643511,,0.035,30
+C022,Papelería Ferrer S.L.,Papelería,ES,B03604493,,0.031,60
+C023,Papelería Font S.L.,Papelería,ES,B30776025,,0.031,60
+C024,Librería Prat Tarragona S.L.,Librería,ES,B03042884,,0.021,60
+C025,Papelería Castell S.L.,Papelería,ES,B25264607,,0.013,60
+C026,Colegio Girona Roca S.Coop.,Centro educativo,ES,F46571147,,0.021,30
+C027,Colegio Huesca Puig S.Coop.,Centro educativo,ES,F30443550,,0.012,30
+C028,Papelería Gil S.L.,Papelería,ES,B30855647,,0.008,60
+C029,Colegio Manresa Prat S.Coop.,Centro educativo,ES,F50334671,,0.009,30
+C030,Colegio Alacant Font S.Coop.,Centro educativo,ES,F03130143,,0.003,30
+C031,Papelería Garriga S.L.,Papelería,ES,B43109263,,0.02,60
+C032,Soler Consultores Granollers S.L.,Empresa (oficinas),ES,B46945093,,0.019,60
+C033,Papelería Bosch S.L.,Papelería,ES,B30275200,,0.016,60
+C034,Papelería Soler S.L.,Papelería,ES,B08959777,,0.0,60
+C035,Papelería Puig S.L.,Papelería,ES,B28394476,,0.0,60
+C036,Papelería Cano S.L.,Papelería,ES,B28887297,,0.012,60
+C037,Cano Consultores Figueres S.L.,Empresa (oficinas),ES,B46339248,,0.009,60
+C038,Librería Sanz Castelló S.L.,Librería,ES,B25125576,,0.023,60
+C039,Papelería Prat S.L.,Papelería,ES,B50541234,,0.009,60
+C040,Colegio Igualada Riera S.Coop.,Centro educativo,ES,F08031882,,0.0,30
+C041,Papelaria Douro Lda,Distribuidor UE,PT,,PT548681104,0.05,30
+C042,Escritório Lisboa Lda,Distribuidor UE,PT,,PT531038785,0.04,30
+C043,Papelaria Minho Lda,Distribuidor UE,PT,,PT597651736,0.03,30
+C044,Bureau Midi SARL,Distribuidor UE,FR,,FR41418324958,0.03,30
+C045,Fournitures Lyonnaises SARL,Distribuidor UE,FR,,,0.02,30
