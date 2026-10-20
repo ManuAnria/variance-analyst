@@ -28,3 +28,56 @@ def ventas_presupuesto_por_categoria(mes_hasta: int) -> pd.DataFrame:
     ppto = pd.read_csv(RUTA_DATOS / "presupuesto_2026_drivers_ventas.csv")
     ppto = ppto[ppto.mes <= mes_hasta]
     return ppto[["mes", "categoria", "unidades", "ventas"]].copy()
+
+def coste_ventas_real_por_categoria(ejercicio: int, mes_hasta: int) -> pd.DataFrame:
+    """Coste de ventas real (cuentas 600 + 610) por mes y categoría, desde el libro diario."""
+    diario = pd.read_csv(RUTA_DATOS / "diario.csv", dtype={"cuenta": str}, parse_dates=["fecha"])
+
+    df = diario[
+        diario.cuenta.isin(["600", "610"])
+        & (diario.tipo_asiento != "REGULARIZACION")
+        & (diario.ejercicio == ejercicio)
+        & (diario.fecha.dt.month <= mes_hasta)
+    ].copy()
+    df["mes"] = df.fecha.dt.month
+    df["coste_ventas"] = df.debe - df.haber
+
+    return df.groupby(["mes", "categoria"], as_index=False).coste_ventas.sum()
+
+
+def coste_ventas_presupuesto_por_categoria(mes_hasta: int) -> pd.DataFrame:
+    """Coste de ventas presupuestado por mes y categoría, desde los drivers del presupuesto."""
+    ppto = pd.read_csv(RUTA_DATOS / "presupuesto_2026_drivers_ventas.csv")
+    ppto = ppto[ppto.mes <= mes_hasta]
+    return ppto[["mes", "categoria", "coste_ventas"]].copy()
+
+def personal_real_por_centro(ejercicio: int, mes_hasta: int) -> pd.DataFrame:
+    """FTE-mes (plantilla) y coste de personal real (640 + 642) por centro de coste."""
+    plantilla = pd.read_csv(RUTA_DATOS / "plantilla_real.csv")
+    plantilla = plantilla[(plantilla.ejercicio == ejercicio) & (plantilla.mes <= mes_hasta)]
+    fte = plantilla.groupby("centro_coste", as_index=False).fte.sum().rename(columns={"fte": "fte_meses"})
+
+    diario = pd.read_csv(RUTA_DATOS / "diario.csv", dtype={"cuenta": str}, parse_dates=["fecha"])
+    gasto = diario[
+        diario.cuenta.isin(["640", "642"])
+        & (diario.tipo_asiento != "REGULARIZACION")
+        & (diario.ejercicio == ejercicio)
+        & (diario.fecha.dt.month <= mes_hasta)
+    ].copy()
+    gasto["coste"] = gasto.debe - gasto.haber
+    coste = gasto.groupby("centro_coste", as_index=False).coste.sum()
+
+    return fte.merge(coste, on="centro_coste")
+
+
+def personal_presupuesto_por_centro(mes_hasta: int) -> pd.DataFrame:
+    """FTE-mes y coste de personal presupuestado (640 + 642) por centro de coste."""
+    plantilla = pd.read_csv(RUTA_DATOS / "presupuesto_2026_plantilla.csv")
+    plantilla = plantilla[plantilla.mes <= mes_hasta]
+    fte = plantilla.groupby("centro_coste", as_index=False).fte.sum().rename(columns={"fte": "fte_meses"})
+
+    ppto = pd.read_csv(RUTA_DATOS / "presupuesto_2026.csv", dtype={"cuenta": str})
+    ppto = ppto[ppto.cuenta.isin(["640", "642"]) & (ppto.mes <= mes_hasta)]
+    coste = ppto.groupby("centro_coste", as_index=False).importe.sum().rename(columns={"importe": "coste"})
+
+    return fte.merge(coste, on="centro_coste")
