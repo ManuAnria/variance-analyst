@@ -1,0 +1,256 @@
+{
+  "empresa": "Grafilia Distribución S.L.",
+  "periodo": {
+    "ejercicio": 2026,
+    "desde_mes": 1,
+    "hasta_mes": 9
+  },
+  "convencion_signos": "Desviación positiva = favorable; negativa = desfavorable.",
+  "cuenta_resultados": [
+    {
+      "partida": "ventas",
+      "real": 7370400,
+      "presupuesto": 7829272,
+      "desviacion": -458871,
+      "desviacion_pct": -5.9
+    },
+    {
+      "partida": "margen_bruto",
+      "real": 1797274,
+      "presupuesto": 2035934,
+      "desviacion": -238659,
+      "desviacion_pct": -11.7
+    },
+    {
+      "partida": "gastos_personal",
+      "real": 988039,
+      "presupuesto": 978912,
+      "desviacion": -9127,
+      "desviacion_pct": -0.9
+    },
+    {
+      "partida": "otros_gastos",
+      "real": 536475,
+      "presupuesto": 516172,
+      "desviacion": -20303,
+      "desviacion_pct": -3.9
+    },
+    {
+      "partida": "resultado_antes_impuestos",
+      "real": 272760,
+      "presupuesto": 540849,
+      "desviacion": -268090,
+      "desviacion_pct": -49.6
+    }
+  ],
+  "margen_bruto_pct": {
+    "real": 24.4,
+    "presupuesto": 26.0
+  },
+  "ventas_por_categoria": [
+    {
+      "categoria": "ESC",
+      "nombre": "Material escolar",
+      "unidades_r": 747220,
+      "unidades_p": 841603,
+      "ventas_r": 2044908,
+      "ventas_p": 2252726,
+      "efecto_volumen": -414451,
+      "efecto_mix": -18625,
+      "efecto_precio": 44817,
+      "desviacion_total": -207819
+    },
+    {
+      "categoria": "LIB",
+      "nombre": "Libros",
+      "unidades_r": 72685,
+      "unidades_p": 78754,
+      "ventas_r": 1264864,
+      "ventas_p": 1364500,
+      "efecto_volumen": -38783,
+      "efecto_mix": 36590,
+      "efecto_precio": 5517,
+      "desviacion_total": -99635
+    },
+    {
+      "categoria": "OFI",
+      "nombre": "Material de oficina",
+      "unidades_r": 174265,
+      "unidades_p": 185417,
+      "ventas_r": 1011121,
+      "ventas_p": 1070107,
+      "efecto_volumen": -91309,
+      "efecto_mix": 46799,
+      "efecto_precio": 5377,
+      "desviacion_total": -58985
+    },
+    {
+      "categoria": "PAP",
+      "nombre": "Papel y cuadernos",
+      "unidades_r": 462556,
+      "unidades_p": 526241,
+      "ventas_r": 2011094,
+      "ventas_p": 2273376,
+      "efecto_volumen": -259150,
+      "efecto_mix": -38966,
+      "efecto_precio": 12838,
+      "desviacion_total": -262283
+    },
+    {
+      "categoria": "TEC",
+      "nombre": "Tecnología educativa",
+      "unidades_r": 23229,
+      "unidades_p": 19497,
+      "ventas_r": 1038413,
+      "ventas_p": 868563,
+      "efecto_volumen": -9601,
+      "efecto_mix": 256480,
+      "efecto_precio": 3595,
+      "desviacion_total": 169850
+    }
+  ],
+  "margen_por_categoria": [
+    {
+      "categoria": "ESC",
+      "nombre": "Material escolar",
+      "margen_r": 746973,
+      "margen_p": 791970,
+      "efecto_volumen": -107774,
+      "efecto_mix": -6548,
+      "efecto_precio": 44817,
+      "efecto_coste": -997,
+      "desviacion_total": -44997
+    },
+    {
+      "categoria": "LIB",
+      "nombre": "Libros",
+      "margen_r": 265163,
+      "margen_p": 282827,
+      "efecto_volumen": -10085,
+      "efecto_mix": 7584,
+      "efecto_precio": 5517,
+      "efecto_coste": -1385,
+      "desviacion_total": -17664
+    },
+    {
+      "categoria": "OFI",
+      "nombre": "Material de oficina",
+      "margen_r": 227315,
+      "margen_p": 302618,
+      "efecto_volumen": -23744,
+      "efecto_mix": 13234,
+      "efecto_precio": 5377,
+      "efecto_coste": -62479,
+      "desviacion_total": -75303
+    },
+    {
+      "categoria": "PAP",
+      "nombre": "Papel y cuadernos",
+      "margen_r": 431788,
+      "margen_p": 555225,
+      "efecto_volumen": -67390,
+      "efecto_mix": -9517,
+      "efecto_precio": 12838,
+      "efecto_coste": -69083,
+      "desviacion_total": -123437
+    },
+    {
+      "categoria": "TEC",
+      "nombre": "Tecnología educativa",
+      "margen_r": 126035,
+      "margen_p": 103293,
+      "efecto_volumen": -2497,
+      "efecto_mix": 30502,
+      "efecto_precio": 3595,
+      "efecto_coste": -626,
+      "desviacion_total": 22742
+    }
+  ],
+  "personal_por_centro": [
+    {
+      "centro_coste": "ADM",
+      "nombre": "Administración",
+      "fte_meses_r": 54,
+      "fte_meses_p": 54,
+      "coste_r": 200590,
+      "coste_p": 201901,
+      "efecto_plantilla": 0,
+      "efecto_coste_medio": 1311,
+      "desviacion_total": 1311
+    },
+    {
+      "centro_coste": "COM",
+      "nombre": "Comercial",
+      "fte_meses_r": 69,
+      "fte_meses_p": 72,
+      "coste_r": 281175,
+      "coste_p": 293674,
+      "efecto_plantilla": 12236,
+      "efecto_coste_medio": 263,
+      "desviacion_total": 12499
+    },
+    {
+      "centro_coste": "DIR",
+      "nombre": "Dirección",
+      "fte_meses_r": 18,
+      "fte_meses_p": 18,
+      "coste_r": 147545,
+      "coste_p": 146837,
+      "efecto_plantilla": 0,
+      "efecto_coste_medio": -708,
+      "desviacion_total": -708
+    },
+    {
+      "centro_coste": "LOG",
+      "nombre": "Logística",
+      "fte_meses_r": 118,
+      "fte_meses_p": 110,
+      "coste_r": 358731,
+      "coste_p": 336501,
+      "efecto_plantilla": -24473,
+      "efecto_coste_medio": 2243,
+      "desviacion_total": -22230
+    }
+  ],
+  "otros_gastos_materiales": [
+    {
+      "cuenta": "624",
+      "nombre": "Transportes",
+      "centro_coste": "Logística",
+      "real": 201547,
+      "presupuesto": 187903,
+      "desviacion": -13644,
+      "desviacion_pct": -7.3,
+      "patron": "recurrente",
+      "mes_clave": 3,
+      "efecto_actividad": 11013,
+      "efecto_tarifa": -24657
+    },
+    {
+      "cuenta": "622",
+      "nombre": "Reparaciones y conservación",
+      "centro_coste": "Logística",
+      "real": 14181,
+      "presupuesto": 7650,
+      "desviacion": -6531,
+      "desviacion_pct": -85.4,
+      "patron": "puntual",
+      "mes_clave": 2
+    },
+    {
+      "cuenta": "627",
+      "nombre": "Publicidad, propaganda y relaciones públicas",
+      "centro_coste": "Comercial",
+      "real": 51045,
+      "presupuesto": 50445,
+      "desviacion": -600,
+      "desviacion_pct": -1.2,
+      "patron": "calendario",
+      "mes_clave": 9
+    }
+  ],
+  "otros_gastos_no_materiales": {
+    "numero_partidas": 13,
+    "desviacion_conjunta": 472
+  }
+}
