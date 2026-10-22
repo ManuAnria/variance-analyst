@@ -115,6 +115,10 @@ def analizar_gastos(real: pd.DataFrame, ppto: pd.DataFrame, nombres: dict,
             serie_patron = flex.set_index("mes").efecto_tarifa
 
         fila["patron"], fila["mes_clave"] = clasificar_patron(serie_patron)
+        fila["mes_origen"] = None
+        if fila["patron"] == "calendario":  # mes en que estaba presupuestado (signo contrario al de mes_clave)
+            fila["mes_origen"] = int(serie_patron.idxmax() if serie_patron[fila["mes_clave"]] < 0
+                                     else serie_patron.idxmin())
         fila["material"] = es_material(fila["desviacion"], fila["ppto"], fila["patron"],
                                        grupo.desviacion.abs().sum())
         filas.append(fila)

@@ -1,10 +1,13 @@
 """
-hechos.py — Ensambla el paquete de hechos que recibirá el LLM.
+hechos.py — Ensambla el paquete de hechos que recibirá el LLM.  (v2)
 
 Ejecuta los cuatro análisis (ventas, margen, personal, gastos), comprueba que juntos
 explican el resultado completo de la contabilidad y guarda todo en un JSON.
 
-El LLM solo podrá citar cifras que estén en este paquete.
+v2: el motor INTERPRETA cada cifra (favorable/desfavorable, por encima/por debajo del
+presupuesto, lectura de la plantilla y del patrón) para que el modelo no tenga que
+deducirlo de los signos. Incluye el puente del resultado: los principales impulsores
+de la desviación, ordenados por importe.
 
 Uso:  python hechos.py        -> salidas/hechos_desviaciones.json
 """
@@ -23,10 +26,15 @@ RUTA_SALIDAS = Path(__file__).resolve().parent.parent / "salidas"
 NOMBRES_CATEGORIAS = {"PAP": "Papel y cuadernos", "ESC": "Material escolar", "OFI": "Material de oficina",
                       "TEC": "Tecnología educativa", "LIB": "Libros"}
 NOMBRES_CENTROS = {"COM": "Comercial", "LOG": "Logística", "ADM": "Administración", "DIR": "Dirección"}
+MESES = ["", "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+         "septiembre", "octubre", "noviembre", "diciembre"]
+
+UMBRAL_EN_LINEA = 500        # € — por debajo, una desviación se considera "en línea"
+UMBRAL_PUENTE = 10_000       # € — impulsores del resultado que se muestran por separado
 
 
 # --------------------------------------------------------------------------- #
-# Utilidades
+# Utilidades de formato e interpretación
 # --------------------------------------------------------------------------- #
 def euros(x) -> int:
     """Redondea a euros enteros: el LLM no necesita céntimos y así es más fácil validar sus cifras."""
@@ -38,13 +46,61 @@ def pct(x) -> float | None:
     return None if x is None or pd.isna(x) else round(float(x) * 100, 1)
 
 
+def valoracion(desviacion: float) -> str:
+    """Convención del motor: positivo = favorable."""
+    if abs(desviacion) < UMBRAL_EN_LINEA:
+        return "en línea con el presupuesto"
+    return "favorable" if desviacion > 0 else "desfavorable"
+
+
+def comparacion(real: float, ppto: float) -> str:
+    """Dirección del importe real frente al presupuesto, sin ambigüedad de signos."""
+    if abs(real - ppto) < UMBRAL_EN_LINEA:
+        return "en línea con el presupuesto"
+    return "por encima del presupuesto" if real > ppto else "por debajo del presupuesto"
+
+
+def lectura_plantilla(diferencia: float) -> str:
+    d = int(round(diferencia))
+    if d == 0:
+        return "misma plantilla que el presupuesto"
+    return f"{abs(d)} FTE-mes {'más' if d > 0 else 'menos'} que el presupuesto"
+
+
+def lectura_patron(patron: str, mes_clave, mes_origen) -> str:
+    # pandas guarda los meses como decimales (8.0) si la columna tiene huecos: se pasan a entero
+    mes_clave = int(mes_clave) if pd.notna(mes_clave) else None
+    mes_origen = int(mes_origen) if pd.notna(mes_origen) else None
+    if patron == "puntual":
+        return f"gasto extraordinario concentrado en {MESES[mes_clave]}"
+    if patron == "recurrente":
+        return f"desviación sostenida desde {MESES[mes_clave]}"
+    if patron == "calendario":
+        return f"gasto presupuestado en {MESES[mes_origen]} y ejecutado en {MESES[mes_clave]}"
+    return "sin desviación"
+
+
 def tabla(df: pd.DataFrame, clave: str, nombres: dict, columnas: list[str]) -> list[dict]:
-    """Convierte un DataFrame de resultados en una lista de diccionarios con importes en euros."""
+    """Convierte un resultado por categoría o centro en filas con importes en euros y su valoración."""
     filas = []
     for _, r in df.iterrows():
         fila = {clave: r[clave], "nombre": nombres.get(r[clave], r[clave])}
         fila.update({c: euros(r[c]) for c in columnas})
+        fila["valoracion"] = valoracion(r["desviacion_total"])
         filas.append(fila)
+    return filas
+
+
+# --------------------------------------------------------------------------- #
+# Bloques del paquete
+# --------------------------------------------------------------------------- #
+def personal_por_centro(personal: pd.DataFrame) -> list[dict]:
+    filas = tabla(personal, "centro_coste", NOMBRES_CENTROS,
+                  ["fte_meses_r", "fte_meses_p", "coste_r", "coste_p",
+                   "efecto_plantilla", "efecto_coste_medio", "desviacion_total"])
+    for fila, (_, r) in zip(filas, personal.iterrows()):
+        fila["lectura_plantilla"] = lectura_plantilla(r.fte_meses_r - r.fte_meses_p)
+        fila["comparacion"] = comparacion(r.coste_r, r.coste_p)
     return filas
 
 
@@ -55,12 +111,58 @@ def gastos_materiales(gastos: pd.DataFrame) -> list[dict]:
         fila = {"cuenta": r.cuenta, "nombre": r.nombre,
                 "centro_coste": NOMBRES_CENTROS.get(r.centro_coste, r.centro_coste),
                 "real": euros(r.real), "presupuesto": euros(r.ppto), "desviacion": euros(r.desviacion),
-                "desviacion_pct": pct(r.desviacion_pct), "patron": r.patron, "mes_clave": int(r.mes_clave)}
+                "variacion_pct": abs(pct(r.desviacion_pct)),
+                "valoracion": valoracion(r.desviacion), "comparacion": comparacion(r.real, r.ppto),
+                "patron": r.patron, "lectura_patron": lectura_patron(r.patron, r.mes_clave, r.mes_origen)}
         if pd.notna(r.get("efecto_tarifa")):
             fila["efecto_actividad"] = euros(r.efecto_actividad)
             fila["efecto_tarifa"] = euros(r.efecto_tarifa)
+            fila["lectura_flexible"] = (
+                f"efecto actividad {valoracion(r.efecto_actividad)} (las ventas fueron "
+                f"{'inferiores' if r.efecto_actividad > 0 else 'superiores'} a lo presupuestado); "
+                f"efecto tarifa {valoracion(r.efecto_tarifa)} (el coste por euro vendido fue "
+                f"{'superior' if r.efecto_tarifa < 0 else 'inferior'} al presupuestado)")
         filas.append(fila)
     return filas
+
+
+def puente_resultado(margen, personal, gastos, desviacion_resultado: float) -> dict:
+    """
+    Todos los efectos que explican la desviación del resultado, del mayor al menor.
+    Los de importe >= UMBRAL_PUENTE se muestran uno a uno; el resto se agrupa.
+    """
+    efectos = [("Volumen total de unidades vendidas (margen)", margen.efecto_volumen.sum())]
+    for _, r in margen.iterrows():
+        cat = NOMBRES_CATEGORIAS[r.categoria]
+        efectos += [(f"Mix de ventas: {cat}", r.efecto_mix),
+                    (f"Precio de venta: {cat}", r.efecto_precio),
+                    (f"Coste unitario de compra: {cat}", r.efecto_coste)]
+    for _, r in personal.iterrows():
+        centro = NOMBRES_CENTROS[r.centro_coste]
+        efectos += [(f"Plantilla {centro} ({lectura_plantilla(r.fte_meses_r - r.fte_meses_p)})", r.efecto_plantilla),
+                    (f"Coste medio por persona: {centro}", r.efecto_coste_medio)]
+    for _, r in gastos.iterrows():
+        nombre = f"{r.nombre} ({NOMBRES_CENTROS.get(r.centro_coste, r.centro_coste)})"
+        if pd.notna(r.get("efecto_tarifa")):
+            efectos += [(f"{nombre}: tarifa por euro vendido", r.efecto_tarifa),
+                        (f"{nombre}: nivel de actividad", r.efecto_actividad)]
+        else:
+            efectos.append((nombre, r.desviacion))
+
+    efectos.sort(key=lambda e: abs(e[1]), reverse=True)
+    principales = [e for e in efectos if abs(e[1]) >= UMBRAL_PUENTE]
+    resto = [e for e in efectos if abs(e[1]) < UMBRAL_PUENTE]
+
+    # Control: los efectos del puente suman exactamente la desviación del resultado
+    assert abs(sum(e[1] for e in efectos) - desviacion_resultado) < 1, "El puente del resultado no cuadra"
+
+    return {
+        "desviacion_resultado": euros(desviacion_resultado),
+        "principales_impulsores": [{"concepto": c, "importe": euros(i), "valoracion": valoracion(i)}
+                                   for c, i in principales],
+        "resto": {"numero_efectos": len(resto), "importe": euros(sum(i for _, i in resto)),
+                  "valoracion": valoracion(sum(i for _, i in resto))},
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -100,19 +202,24 @@ def construir_hechos(ejercicio: int, mes_hasta: int) -> dict:
 
     # --- 5. Paquete de hechos ------------------------------------------------------------
     es_gasto = {"gastos_personal", "otros_gastos"}
+    cuenta_resultados = []
+    for partida, (r, p) in resumen.items():
+        desv = (p - r) if partida in es_gasto else (r - p)
+        cuenta_resultados.append({
+            "partida": partida, "real": euros(r), "presupuesto": euros(p), "desviacion": euros(desv),
+            "variacion_pct": abs(pct(desv / p)), "valoracion": valoracion(desv), "comparacion": comparacion(r, p)})
+
     return {
         "empresa": "Grafilia Distribución S.L.",
-        "periodo": {"ejercicio": ejercicio, "desde_mes": 1, "hasta_mes": mes_hasta},
-        "convencion_signos": "Desviación positiva = favorable; negativa = desfavorable.",
+        "periodo": f"enero a {MESES[mes_hasta]} de {ejercicio}",
+        "convencion": "Desviación e importes de efectos: positivo = favorable, negativo = desfavorable. "
+                      "Usa siempre los campos 'valoracion' y 'comparacion'; no deduzcas nada del signo.",
 
-        "cuenta_resultados": [
-            {"partida": k, "real": euros(r), "presupuesto": euros(p),
-             "desviacion": euros((p - r) if k in es_gasto else (r - p)),
-             "desviacion_pct": pct(((p - r) if k in es_gasto else (r - p)) / p)}
-            for k, (r, p) in resumen.items()
-        ],
+        "cuenta_resultados": cuenta_resultados,
         "margen_bruto_pct": {"real": pct(resumen["margen_bruto"][0] / resumen["ventas"][0]),
                              "presupuesto": pct(resumen["margen_bruto"][1] / resumen["ventas"][1])},
+
+        "puente_resultado": puente_resultado(margen, personal, gastos, res_r - res_p),
 
         "ventas_por_categoria": tabla(ventas, "categoria", NOMBRES_CATEGORIAS,
             ["unidades_r", "unidades_p", "ventas_r", "ventas_p",
@@ -122,14 +229,13 @@ def construir_hechos(ejercicio: int, mes_hasta: int) -> dict:
             ["margen_r", "margen_p", "efecto_volumen", "efecto_mix",
              "efecto_precio", "efecto_coste", "desviacion_total"]),
 
-        "personal_por_centro": tabla(personal, "centro_coste", NOMBRES_CENTROS,
-            ["fte_meses_r", "fte_meses_p", "coste_r", "coste_p",
-             "efecto_plantilla", "efecto_coste_medio", "desviacion_total"]),
+        "personal_por_centro": personal_por_centro(personal),
 
         "otros_gastos_materiales": gastos_materiales(gastos),
         "otros_gastos_no_materiales": {
             "numero_partidas": int((~gastos.material).sum()),
             "desviacion_conjunta": euros(gastos[~gastos.material].desviacion.sum()),
+            "valoracion": valoracion(gastos[~gastos.material].desviacion.sum()),
         },
     }
 
