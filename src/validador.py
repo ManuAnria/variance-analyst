@@ -5,13 +5,15 @@ Cuatro controles:
   1. Existencia:  cada cifra del texto está en el paquete (no hay cifras inventadas ni calculadas).
   2. Valoración:  si la frase dice "favorable"/"desfavorable", coincide con el signo de la cifra.
   3. Dirección:   si la frase dice "por encima"/"por debajo" del presupuesto, coincide con la realidad.
-  4. Cobertura:   los principales impulsores del puente del resultado aparecen en el informe.
+  4. Cobertura:   los principales impulsores del puente del resultado aparecen en el informe,
+                  distinguiendo si solo se mencionan o si además se cuantifican.
 
 Uso:  python validador.py salidas/informe_xxx.md
 """
 import json
 import re
 import sys
+import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -22,6 +24,20 @@ CAMPOS_CON_VALORACION = ("desviacion", "efecto_", "importe")
 
 PALABRAS_ENCIMA = ("por encima", "superior", "más que el presupuesto", "mayor que el presupuesto", "aumentado")
 PALABRAS_DEBAJO = ("por debajo", "inferior", "menos que el presupuesto", "menor que el presupuesto")
+
+# Palabras que identifican cada tipo de impulsor del puente (sin tildes, en minúscula)
+CLAVES_TIPO = {
+    "volumen": ("volumen",),
+    "mix": ("mix",),
+    "precio": ("precio",),
+    "coste_unitario": ("coste unitario", "coste de compra", "costes de compra", "coste unitario de compra"),
+    "plantilla": ("plantilla",),
+    "coste_medio": ("coste medio",),
+    "tarifa": ("tarifa",),
+    "actividad": ("actividad",),
+    "gasto": (),                       # partidas de gasto: basta con nombrar la cuenta
+}
+PALABRAS_VACIAS = {"material", "de", "del", "y", "la", "el", "los", "las"}
 
 
 # --------------------------------------------------------------------------- #
@@ -151,6 +167,33 @@ def palabra_mas_cercana(frase: str, posicion: int, grupos: dict[str, tuple[str, 
     return mejor
 
 
+def normalizar(texto: str) -> str:
+    """Minúsculas y sin tildes: 'Logística' -> 'logistica'."""
+    sin_tildes = unicodedata.normalize("NFD", texto).encode("ascii", "ignore").decode()
+    return sin_tildes.lower()
+
+
+def raiz_objeto(objeto: str | None) -> str | None:
+    """Palabra que identifica el objeto: 'Material de oficina' -> 'oficina', 'Transportes' -> 'transport'."""
+    if not objeto:
+        return None
+    palabras = [p for p in re.findall(r"[a-z]+", normalizar(objeto)) if p not in PALABRAS_VACIAS]
+    p = palabras[0]
+    if p.endswith("es") and len(p) > 6:
+        return p[:-2]                                  # reparaciones -> reparacion, transportes -> transport
+    return p[:-1] if p.endswith("s") else p            # libros -> libro
+
+
+def menciona(frase: str, impulsor: dict) -> bool:
+    """La frase habla del impulsor: contiene una palabra de su tipo y el nombre de su objeto."""
+    f = normalizar(frase)
+    claves = CLAVES_TIPO.get(impulsor["tipo"], ())
+    raiz = raiz_objeto(impulsor.get("objeto"))
+    tiene_tipo = not claves or any(c in f for c in claves)
+    tiene_objeto = raiz is None or raiz in f
+    return tiene_tipo and tiene_objeto
+
+
 @dataclass
 class Resultado:
     cifras_revisadas: int = 0
@@ -159,7 +202,8 @@ class Resultado:
     valoracion_incorrecta: list = field(default_factory=list)
     direccion_incorrecta: list = field(default_factory=list)
     signo_invertido: list = field(default_factory=list)
-    impulsores_citados: list = field(default_factory=list)
+    impulsores_cuantificados: list = field(default_factory=list)     # mencionado y con su importe
+    impulsores_sin_importe: list = field(default_factory=list)       # mencionado, pero sin importe
     impulsores_omitidos: list = field(default_factory=list)
 
     @property
@@ -168,9 +212,17 @@ class Resultado:
                 + len(self.direccion_incorrecta) + len(self.signo_invertido))
 
     @property
-    def cobertura(self) -> float:
-        total = len(self.impulsores_citados) + len(self.impulsores_omitidos)
-        return len(self.impulsores_citados) / total if total else 1.0
+    def _total_impulsores(self) -> int:
+        return len(self.impulsores_cuantificados) + len(self.impulsores_sin_importe) + len(self.impulsores_omitidos)
+
+    @property
+    def cobertura_mencion(self) -> float:
+        menc = len(self.impulsores_cuantificados) + len(self.impulsores_sin_importe)
+        return menc / self._total_impulsores if self._total_impulsores else 1.0
+
+    @property
+    def cobertura_cuantificada(self) -> float:
+        return len(self.impulsores_cuantificados) / self._total_impulsores if self._total_impulsores else 1.0
 
 
 def validar(texto: str, paquete: dict) -> Resultado:
@@ -216,12 +268,18 @@ def validar(texto: str, paquete: dict) -> Resultado:
             if dicha and "en línea" not in correcta and dicha != correcta:
                 res.direccion_incorrecta.append(f"{detalle}  -> dice «{dicha}», es «{correcta}»")
 
-    # Control 4: cobertura de los principales impulsores
-    valores_texto = {abs(c.valor) for c in extraer_cifras(texto) if not c.es_porcentaje}
+    # Control 4: cobertura de los principales impulsores (mencionado / cuantificado)
+    frases = partir_frases(texto)
     for imp in paquete.get("puente_resultado", {}).get("principales_impulsores", []):
-        citado = any(abs(abs(imp["importe"]) - v) <= 1 for v in valores_texto)
-        (res.impulsores_citados if citado else res.impulsores_omitidos).append(
-            f"{imp['concepto']} ({imp['importe']:+,} €)")
+        etiqueta = f"{imp['concepto']} ({imp['importe_texto']}, {imp['valoracion']})"
+        frases_que_lo_citan = [f for f in frases if menciona(f, imp)]
+        if not frases_que_lo_citan:
+            res.impulsores_omitidos.append(etiqueta)
+        elif any(abs(abs(c.valor) - abs(imp["importe"])) <= 1
+                 for c in extraer_cifras("\n".join(frases_que_lo_citan)) if not c.es_porcentaje):
+            res.impulsores_cuantificados.append(etiqueta)
+        else:
+            res.impulsores_sin_importe.append(etiqueta)
 
     return res
 
@@ -231,12 +289,14 @@ def validar(texto: str, paquete: dict) -> Resultado:
 # --------------------------------------------------------------------------- #
 def imprimir(res: Resultado) -> None:
     print(f"Cifras revisadas: {res.cifras_revisadas}   Errores: {res.errores}   "
-          f"Cobertura de impulsores: {res.cobertura:.0%}")
+          f"Impulsores mencionados: {res.cobertura_mencion:.0%}   "
+          f"cuantificados: {res.cobertura_cuantificada:.0%}")
     secciones = [("Cifras que no están en el paquete", res.no_encontradas),
                  ("Unidad incorrecta", res.unidad_incorrecta),
                  ("Signo invertido", res.signo_invertido),
                  ("Valoración incorrecta (favorable/desfavorable)", res.valoracion_incorrecta),
                  ("Dirección incorrecta (por encima/por debajo)", res.direccion_incorrecta),
+                 ("Impulsores mencionados sin su importe", res.impulsores_sin_importe),
                  ("Impulsores principales omitidos", res.impulsores_omitidos)]
     for titulo, lista in secciones:
         if lista:

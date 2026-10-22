@@ -55,66 +55,101 @@
   },
   "puente_resultado": {
     "desviacion_resultado": -268090,
+    "desviacion_resultado_texto": "268.090 €",
     "principales_impulsores": [
       {
         "concepto": "Volumen total de unidades vendidas (margen)",
         "importe": -211490,
-        "valoracion": "desfavorable"
+        "importe_texto": "211.490 €",
+        "valoracion": "desfavorable",
+        "tipo": "volumen",
+        "objeto": null
       },
       {
         "concepto": "Coste unitario de compra: Papel y cuadernos",
         "importe": -69083,
-        "valoracion": "desfavorable"
+        "importe_texto": "69.083 €",
+        "valoracion": "desfavorable",
+        "tipo": "coste_unitario",
+        "objeto": "Papel y cuadernos"
       },
       {
         "concepto": "Coste unitario de compra: Material de oficina",
         "importe": -62479,
-        "valoracion": "desfavorable"
+        "importe_texto": "62.479 €",
+        "valoracion": "desfavorable",
+        "tipo": "coste_unitario",
+        "objeto": "Material de oficina"
       },
       {
         "concepto": "Precio de venta: Material escolar",
         "importe": 44817,
-        "valoracion": "favorable"
+        "importe_texto": "44.817 €",
+        "valoracion": "favorable",
+        "tipo": "precio",
+        "objeto": "Material escolar"
       },
       {
         "concepto": "Mix de ventas: Tecnología educativa",
         "importe": 30502,
-        "valoracion": "favorable"
+        "importe_texto": "30.502 €",
+        "valoracion": "favorable",
+        "tipo": "mix",
+        "objeto": "Tecnología educativa"
       },
       {
         "concepto": "Transportes (Logística): tarifa por euro vendido",
         "importe": -24657,
-        "valoracion": "desfavorable"
+        "importe_texto": "24.657 €",
+        "valoracion": "desfavorable",
+        "tipo": "tarifa",
+        "objeto": "Transportes"
       },
       {
         "concepto": "Plantilla Logística (8 FTE-mes más que el presupuesto)",
         "importe": -24473,
-        "valoracion": "desfavorable"
+        "importe_texto": "24.473 €",
+        "valoracion": "desfavorable",
+        "tipo": "plantilla",
+        "objeto": "Logística"
       },
       {
         "concepto": "Mix de ventas: Material de oficina",
         "importe": 13234,
-        "valoracion": "favorable"
+        "importe_texto": "13.234 €",
+        "valoracion": "favorable",
+        "tipo": "mix",
+        "objeto": "Material de oficina"
       },
       {
         "concepto": "Precio de venta: Papel y cuadernos",
         "importe": 12838,
-        "valoracion": "favorable"
+        "importe_texto": "12.838 €",
+        "valoracion": "favorable",
+        "tipo": "precio",
+        "objeto": "Papel y cuadernos"
       },
       {
         "concepto": "Plantilla Comercial (3 FTE-mes menos que el presupuesto)",
         "importe": 12236,
-        "valoracion": "favorable"
+        "importe_texto": "12.236 €",
+        "valoracion": "favorable",
+        "tipo": "plantilla",
+        "objeto": "Comercial"
       },
       {
         "concepto": "Transportes (Logística): nivel de actividad",
         "importe": 11013,
-        "valoracion": "favorable"
+        "importe_texto": "11.013 €",
+        "valoracion": "favorable",
+        "tipo": "actividad",
+        "objeto": "Transportes"
       }
     ],
     "resto": {
       "numero_efectos": 30,
       "importe": -549,
+      "importe_texto": "549 €",
       "valoracion": "desfavorable"
     }
   },

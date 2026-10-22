@@ -1,5 +1,5 @@
 """
-hechos.py — Ensambla el paquete de hechos que recibirá el LLM.  (v2)
+hechos.py — Ensambla el paquete de hechos que recibirá el LLM.  (v3)
 
 Ejecuta los cuatro análisis (ventas, margen, personal, gastos), comprueba que juntos
 explican el resultado completo de la contabilidad y guarda todo en un JSON.
@@ -8,6 +8,9 @@ v2: el motor INTERPRETA cada cifra (favorable/desfavorable, por encima/por debaj
 presupuesto, lectura de la plantilla y del patrón) para que el modelo no tenga que
 deducirlo de los signos. Incluye el puente del resultado: los principales impulsores
 de la desviación, ordenados por importe.
+
+v3: los importes del puente van también ya escritos ("importe_texto": "69.083 €"),
+y cada impulsor lleva su tipo y su objeto para medir si el informe lo menciona.
 
 Uso:  python hechos.py        -> salidas/hechos_desviaciones.json
 """
@@ -39,6 +42,12 @@ UMBRAL_PUENTE = 10_000       # € — impulsores del resultado que se muestran 
 def euros(x) -> int:
     """Redondea a euros enteros: el LLM no necesita céntimos y así es más fácil validar sus cifras."""
     return int(round(float(x)))
+
+
+def euros_texto(x) -> str:
+    """Importe ya escrito en formato español y sin signo: -69083.4 -> '69.083 €'.
+    El modelo solo tiene que copiarlo, no formatearlo."""
+    return f"{abs(euros(x)):,} €".replace(",", ".")
 
 
 def pct(x) -> float | None:
@@ -130,24 +139,28 @@ def puente_resultado(margen, personal, gastos, desviacion_resultado: float) -> d
     """
     Todos los efectos que explican la desviación del resultado, del mayor al menor.
     Los de importe >= UMBRAL_PUENTE se muestran uno a uno; el resto se agrupa.
+    Cada efecto lleva su tipo y su objeto (categoría, centro o cuenta) para que el
+    validador pueda comprobar si el informe lo menciona.
     """
-    efectos = [("Volumen total de unidades vendidas (margen)", margen.efecto_volumen.sum())]
+    # (concepto, importe, tipo, objeto)
+    efectos = [("Volumen total de unidades vendidas (margen)", margen.efecto_volumen.sum(), "volumen", None)]
     for _, r in margen.iterrows():
         cat = NOMBRES_CATEGORIAS[r.categoria]
-        efectos += [(f"Mix de ventas: {cat}", r.efecto_mix),
-                    (f"Precio de venta: {cat}", r.efecto_precio),
-                    (f"Coste unitario de compra: {cat}", r.efecto_coste)]
+        efectos += [(f"Mix de ventas: {cat}", r.efecto_mix, "mix", cat),
+                    (f"Precio de venta: {cat}", r.efecto_precio, "precio", cat),
+                    (f"Coste unitario de compra: {cat}", r.efecto_coste, "coste_unitario", cat)]
     for _, r in personal.iterrows():
         centro = NOMBRES_CENTROS[r.centro_coste]
-        efectos += [(f"Plantilla {centro} ({lectura_plantilla(r.fte_meses_r - r.fte_meses_p)})", r.efecto_plantilla),
-                    (f"Coste medio por persona: {centro}", r.efecto_coste_medio)]
+        efectos += [(f"Plantilla {centro} ({lectura_plantilla(r.fte_meses_r - r.fte_meses_p)})",
+                     r.efecto_plantilla, "plantilla", centro),
+                    (f"Coste medio por persona: {centro}", r.efecto_coste_medio, "coste_medio", centro)]
     for _, r in gastos.iterrows():
         nombre = f"{r.nombre} ({NOMBRES_CENTROS.get(r.centro_coste, r.centro_coste)})"
         if pd.notna(r.get("efecto_tarifa")):
-            efectos += [(f"{nombre}: tarifa por euro vendido", r.efecto_tarifa),
-                        (f"{nombre}: nivel de actividad", r.efecto_actividad)]
+            efectos += [(f"{nombre}: tarifa por euro vendido", r.efecto_tarifa, "tarifa", r.nombre),
+                        (f"{nombre}: nivel de actividad", r.efecto_actividad, "actividad", r.nombre)]
         else:
-            efectos.append((nombre, r.desviacion))
+            efectos.append((nombre, r.desviacion, "gasto", r.nombre))
 
     efectos.sort(key=lambda e: abs(e[1]), reverse=True)
     principales = [e for e in efectos if abs(e[1]) >= UMBRAL_PUENTE]
@@ -156,12 +169,16 @@ def puente_resultado(margen, personal, gastos, desviacion_resultado: float) -> d
     # Control: los efectos del puente suman exactamente la desviación del resultado
     assert abs(sum(e[1] for e in efectos) - desviacion_resultado) < 1, "El puente del resultado no cuadra"
 
+    importe_resto = sum(e[1] for e in resto)
     return {
         "desviacion_resultado": euros(desviacion_resultado),
-        "principales_impulsores": [{"concepto": c, "importe": euros(i), "valoracion": valoracion(i)}
-                                   for c, i in principales],
-        "resto": {"numero_efectos": len(resto), "importe": euros(sum(i for _, i in resto)),
-                  "valoracion": valoracion(sum(i for _, i in resto))},
+        "desviacion_resultado_texto": euros_texto(desviacion_resultado),
+        "principales_impulsores": [
+            {"concepto": c, "importe": euros(i), "importe_texto": euros_texto(i),
+             "valoracion": valoracion(i), "tipo": t, "objeto": o}
+            for c, i, t, o in principales],
+        "resto": {"numero_efectos": len(resto), "importe": euros(importe_resto),
+                  "importe_texto": euros_texto(importe_resto), "valoracion": valoracion(importe_resto)},
     }
 
 
