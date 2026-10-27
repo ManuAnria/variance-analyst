@@ -152,6 +152,11 @@ En los datos se sembraron **10 causas de desviación conocidas** (pérdida de un
 tarifa de un proveedor, cambio de mix, plantilla adelantada, error de corte…). Están en
 `evaluacion/ground_truth/`, fuera de la carpeta de datos que lee el sistema: el modelo nunca las ve.
 
+Los datos son totalmente reproducibles: `scripts/generar_contabilidad.py` regenera todos los CSV (con una
+semilla aleatoria fija) y comprueba que todos los asientos cuadran y que las ventas del diario coinciden con el libro de
+facturas emitidas. `scripts/schema.sql` los carga en PostgreSQL / Supabase con vistas de mayor, sumas y saldos y
+real frente a presupuesto.
+
 ## Cómo ejecutarlo
 
 Requisitos: Python 3.11 o superior y [Ollama](https://ollama.com) (unos 16 GB de RAM para el modelo de 14B).
@@ -185,6 +190,7 @@ Para usar Claude en lugar de un modelo local: `PROVEEDOR_LLM=anthropic`, `MODELO
 ```
 variance-analyst/
 ├── datos/                  # contabilidad sintética (CSV) y supuestos del presupuesto
+├── scripts/                # generador de los datos y esquema PostgreSQL
 ├── evaluacion/ground_truth # causas sembradas: nunca se dan al modelo
 ├── src/                    # motor, agente, redacción, validador y evaluación
 ├── notebooks/              # exploración paso a paso del motor de cálculo

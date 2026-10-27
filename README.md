@@ -149,6 +149,10 @@ payroll, the 2025 year-end close, 2026 actuals through September and a driver-ba
 mix shift, early hires, a cut-off error…). They live in `evaluacion/ground_truth/`, outside the data folder
 the system reads: the model never sees them.
 
+The data is fully reproducible: `scripts/generar_contabilidad.py` regenerates every CSV (fixed random seed)
+and checks that every journal entry balances and that ledger sales match the invoice register. `scripts/schema.sql`
+loads it into PostgreSQL / Supabase with ledger, trial-balance and actual-vs-budget views.
+
 ## How to run it
 
 Requirements: Python 3.11+ and [Ollama](https://ollama.com) (about 16 GB of RAM for the 14B model).
@@ -182,6 +186,7 @@ To use Claude instead of a local model: set `PROVEEDOR_LLM=anthropic`, `MODELO_L
 ```
 variance-analyst/
 ├── datos/                  # synthetic accounting data (CSV) and budget assumptions
+├── scripts/                # data generator and PostgreSQL schema
 ├── evaluacion/ground_truth # seeded root causes: never given to the model
 ├── src/                    # engine, agent, writing, validator and evaluation
 ├── notebooks/              # step-by-step exploration of the calculation engine
