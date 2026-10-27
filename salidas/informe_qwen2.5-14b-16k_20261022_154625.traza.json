@@ -1,0 +1,185 @@
+[
+  {
+    "herramienta": "ventas_por_cliente",
+    "argumentos": {
+      "mes_desde": 1,
+      "mes_hasta": 9
+    },
+    "resultado": {
+      "consulta": "Ventas por cliente, enero-septiembre: 2026 frente a 2025",
+      "nota": "El presupuesto asumía que todos los clientes de 2025 seguían comprando (+6 %).",
+      "clientes": [
+        {
+          "cliente": "Papelerías Mediterráneo S.A.",
+          "tipo": "Cadena de papelerías",
+          "ventas_anio_anterior": 902795,
+          "ventas_anio_actual": 429052,
+          "variacion": -473744,
+          "ultimo_mes_con_compras": "mayo"
+        },
+        {
+          "cliente": "Grupo Escolar Levante S.L.",
+          "tipo": "Cadena de papelerías",
+          "ventas_anio_anterior": 530052,
+          "ventas_anio_actual": 589562,
+          "variacion": 59510,
+          "ultimo_mes_con_compras": "septiembre"
+        },
+        {
+          "cliente": "Marín Consultores Vilanova S.L.",
+          "tipo": "Empresa (oficinas)",
+          "ventas_anio_anterior": 268822,
+          "ventas_anio_actual": 319015,
+          "variacion": 50193,
+          "ultimo_mes_con_compras": "septiembre"
+        },
+        {
+          "cliente": "Papelería Riera S.L.",
+          "tipo": "Papelería",
+          "ventas_anio_anterior": 412827,
+          "ventas_anio_actual": 459795,
+          "variacion": 46967,
+          "ultimo_mes_con_compras": "septiembre"
+        },
+        {
+          "cliente": "Librería Prat Mataró S.L.",
+          "tipo": "Librería",
+          "ventas_anio_anterior": 302473,
+          "ventas_anio_actual": 336445,
+          "variacion": 33972,
+          "ultimo_mes_con_compras": "septiembre"
+        }
+      ]
+    }
+  },
+  {
+    "herramienta": "coste_unitario_mensual",
+    "argumentos": {
+      "categoria": "PAP"
+    },
+    "resultado": {
+      "consulta": "Coste unitario de Papel y cuadernos, enero-septiembre 2026",
+      "meses": [
+        {
+          "mes": "enero",
+          "coste_unitario_real": 3.27,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": 0.2
+        },
+        {
+          "mes": "febrero",
+          "coste_unitario_real": 3.28,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": 0.5
+        },
+        {
+          "mes": "marzo",
+          "coste_unitario_real": 3.24,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": -0.9
+        },
+        {
+          "mes": "abril",
+          "coste_unitario_real": 3.47,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": 6.1
+        },
+        {
+          "mes": "mayo",
+          "coste_unitario_real": 3.51,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": 7.5
+        },
+        {
+          "mes": "junio",
+          "coste_unitario_real": 3.5,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": 7.1
+        },
+        {
+          "mes": "julio",
+          "coste_unitario_real": 3.5,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": 7.2
+        },
+        {
+          "mes": "agosto",
+          "coste_unitario_real": 3.48,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": 6.7
+        },
+        {
+          "mes": "septiembre",
+          "coste_unitario_real": 3.48,
+          "coste_unitario_presupuesto": 3.27,
+          "diferencia_pct": 6.6
+        }
+      ]
+    }
+  },
+  {
+    "herramienta": "coste_unitario_mensual",
+    "argumentos": {
+      "categoria": "OFI"
+    },
+    "resultado": {
+      "consulta": "Coste unitario de Material de oficina, enero-septiembre 2026",
+      "meses": [
+        {
+          "mes": "enero",
+          "coste_unitario_real": 6.89,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": 66.4
+        },
+        {
+          "mes": "febrero",
+          "coste_unitario_real": 4.12,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": -0.6
+        },
+        {
+          "mes": "marzo",
+          "coste_unitario_real": 4.14,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": -0.0
+        },
+        {
+          "mes": "abril",
+          "coste_unitario_real": 4.15,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": 0.3
+        },
+        {
+          "mes": "mayo",
+          "coste_unitario_real": 4.13,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": -0.2
+        },
+        {
+          "mes": "junio",
+          "coste_unitario_real": 4.13,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": -0.1
+        },
+        {
+          "mes": "julio",
+          "coste_unitario_real": 4.1,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": -0.9
+        },
+        {
+          "mes": "agosto",
+          "coste_unitario_real": 4.12,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": -0.5
+        },
+        {
+          "mes": "septiembre",
+          "coste_unitario_real": 4.1,
+          "coste_unitario_presupuesto": 4.14,
+          "diferencia_pct": -0.9
+        }
+      ]
+    }
+  }
+]

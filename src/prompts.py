@@ -6,7 +6,7 @@ Separar el texto de las instrucciones del código permite mejorarlas
 """
 import json
 
-VERSION_PROMPT = "v3"
+VERSION_PROMPT = "v4"
 
 SISTEMA = """Eres el controller financiero de Grafilia Distribución S.L., una distribuidora mayorista de papelería.
 Redactas el comentario de desviaciones (real frente a presupuesto) para el comité de dirección.
@@ -26,6 +26,16 @@ REGLAS ESTRICTAS
    para el presupuesto flexible, "lectura_flexible".
 6. No atribuyas causas que los datos no permitan afirmar (clientes, competencia, mercado...).
    Esas dudas van a "Puntos a investigar".
+7. Si un gasto tiene patron "calendario", explícalo como un desfase de calendario copiando su "lectura_patron":
+   no es un sobrecoste, es un gasto que se ha movido de mes.
+8. Las afirmaciones sin cifra también deben estar respaldadas por un campo del paquete. Si no hay un campo que
+   lo diga, no lo afirmes (por ejemplo, no digas que un coste medio subió si su efecto es favorable).
+
+HALLAZGOS DE LA INVESTIGACIÓN
+Si el mensaje incluye "HALLAZGOS DE LA INVESTIGACIÓN", ya están verificados con los datos. Úsalos para explicar
+la causa de los impulsores en tu narrativa y NO los contradigas. Ejemplo: si un hallazgo dice que el coste anómalo
+de una categoría se debe a una factura contabilizada en el periodo equivocado, no lo presentes como una subida de
+precios. En "Puntos a investigar" no repitas preguntas que los hallazgos ya responden.
 
 IMPULSORES: OBLIGATORIO
 "puente_resultado.principales_impulsores" contiene los impulsores de la desviación del resultado, ordenados
@@ -54,12 +64,15 @@ Lista de 2 a 4 preguntas concretas que los datos NO permiten responder y que hab
 """
 
 
-def mensaje_usuario(hechos: dict, supuestos: str) -> str:
-    """Construye el mensaje con el contexto (supuestos) y los datos (paquete de hechos)."""
+def mensaje_usuario(hechos: dict, supuestos: str, hallazgos: str = "") -> str:
+    """Construye el mensaje con el contexto (supuestos), los datos (hechos) y, si los hay, los hallazgos."""
+    seccion_hallazgos = (f"HALLAZGOS DE LA INVESTIGACIÓN (verificados con los datos)\n{hallazgos}\n\n"
+                         if hallazgos else "")
     return (
         "SUPUESTOS DEL PRESUPUESTO\n"
         f"{supuestos}\n\n"
         "PAQUETE DE HECHOS (JSON)\n"
         f"{json.dumps(hechos, ensure_ascii=False, indent=1)}\n\n"
+        f"{seccion_hallazgos}"
         "Redacta el comentario de desviaciones siguiendo las reglas y el formato indicados."
     )

@@ -31,13 +31,15 @@ CLAVES_TIPO = {
     "mix": ("mix",),
     "precio": ("precio",),
     "coste_unitario": ("coste unitario", "coste de compra", "costes de compra", "coste unitario de compra"),
-    "plantilla": ("plantilla",),
+    "plantilla": ("plantilla", "fte"),
     "coste_medio": ("coste medio",),
-    "tarifa": ("tarifa",),
+    "tarifa": ("tarifa", "por euro vendido", "coste por euro"),
     "actividad": ("actividad",),
     "gasto": (),                       # partidas de gasto: basta con nombrar la cuenta
 }
 PALABRAS_VACIAS = {"material", "de", "del", "y", "la", "el", "los", "las"}
+DISTANCIA_MENCION = 80
+DISTANCIA_CALIFICATIVO = 60   # «favorable», «por encima»... solo califican a una cifra si están a menos de 60 caracteres     # caracteres máximos entre la palabra del tipo y el objeto para contar como mención
 
 
 # --------------------------------------------------------------------------- #
@@ -76,16 +78,23 @@ def recorrer_hechos(nodo, ruta: str = "", comparacion: str | None = None) -> lis
             if isinstance(valor, (int, float)):
                 hechos.append(Hecho(float(valor), clave, f"{ruta}.{clave}".strip("."), comparacion))
             elif isinstance(valor, str):
-                # Cifras dentro de textos interpretados por el motor, p. ej. "8 FTE-mes más que el presupuesto"
-                for m in re.finditer(r"(\d+(?:,\d+)?)\s*(FTE)?", valor):
-                    campo = "fte_texto" if m.group(2) else "texto"
-                    hechos.append(Hecho(float(m.group(1).replace(",", ".")), campo,
-                                        f"{ruta}.{clave}".strip("."), comparacion))
+                hechos += cifras_de_texto(valor, f"{ruta}.{clave}".strip("."), comparacion)
             else:
                 hechos += recorrer_hechos(valor, f"{ruta}.{clave}".strip("."), comparacion)
     elif isinstance(nodo, list):
         for i, elemento in enumerate(nodo):
             hechos += recorrer_hechos(elemento, f"{ruta}[{i}]", None)
+    elif isinstance(nodo, str):                      # un texto suelto, p. ej. los supuestos del presupuesto
+        hechos += cifras_de_texto(nodo, ruta, comparacion)
+    return hechos
+
+
+def cifras_de_texto(texto: str, ruta: str, comparacion: str | None) -> list[Hecho]:
+    """Cifras dentro de un texto: "8 FTE-mes más que el presupuesto", "subida salarial del 3 %", "18.000 €"."""
+    hechos = []
+    for m in re.finditer(r"(\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?)\s*(FTE|%)?", texto):
+        campo = {"FTE": "fte_texto", "%": "pct_texto"}.get(m.group(2), "texto")
+        hechos.append(Hecho(a_numero(m.group(1)), campo, ruta, comparacion))
     return hechos
 
 
@@ -96,6 +105,7 @@ def recorrer_hechos(nodo, ruta: str = "", comparacion: str | None = None) -> lis
 class Cifra:
     texto: str
     valor: float
+    valor_alternativo: float | None     # otra lectura posible del mismo texto (formato inglés: 902,795)
     es_porcentaje: bool
     es_fte: bool
     frase: str
@@ -127,17 +137,26 @@ def partir_frases(texto: str) -> list[str]:
     return frases
 
 
+# Fechas (31/12/2025) y códigos de documento (FR25-00240) no son cifras a validar
+PATRON_NO_CIFRA = re.compile(r"\b\d{1,2}/\d{1,2}/\d{2,4}\b|\b[A-Z]{1,4}\d{2}-\d{3,6}\b")
+
+
 def extraer_cifras(texto: str) -> list[Cifra]:
     cifras = []
+    texto = PATRON_NO_CIFRA.sub(" ", texto)
     for frase in partir_frases(texto):
         frase_sin_lista = re.sub(r"^\s*(\d+\.|-|\*)\s+", "", frase)       # quita "1. " o "- " de las listas
         for m in PATRON_CIFRA.finditer(frase_sin_lista):
             sufijo = m.group("sufijo").strip()
             valor = a_numero(m.group("num"))
-            # Se ignoran números sueltos pequeños sin unidad (meses, recuentos) y el año
-            if not sufijo and (abs(valor) <= 31 or valor == 2026):
+            # Se ignoran números sueltos pequeños sin unidad (meses, recuentos) y los años
+            if not sufijo and (abs(valor) <= 31 or 1990 <= valor <= 2100):
                 continue
-            cifras.append(Cifra(m.group(0).strip(), valor, sufijo == "%", sufijo == "FTE",
+            # "902,795": coma decimal en español, o separador de miles en inglés -> se aceptan las dos lecturas
+            alternativo = None
+            if re.fullmatch(r"[-−–+]?\d{1,3}(,\d{3})+", m.group("num")):
+                alternativo = float(m.group("num").replace(",", "").replace("−", "-").replace("–", "-"))
+            cifras.append(Cifra(m.group(0).strip(), valor, alternativo, sufijo == "%", sufijo == "FTE",
                                 frase_sin_lista, m.start()))
     return cifras
 
@@ -149,7 +168,18 @@ def buscar(cifra: Cifra, hechos: list[Hecho]) -> list[Hecho]:
     """Hechos del paquete que coinciden con la cifra (en valor absoluto: el texto puede omitir el signo)."""
     tolerancia = 0.05 if cifra.es_porcentaje else 1
     candidatos = [h for h in hechos if h.es_porcentaje == cifra.es_porcentaje]
-    return [h for h in candidatos if abs(abs(h.valor) - abs(cifra.valor)) <= tolerancia]
+    lecturas = [cifra.valor] + ([cifra.valor_alternativo] if cifra.valor_alternativo is not None else [])
+    return [h for h in candidatos if any(abs(abs(h.valor) - abs(v)) <= tolerancia for v in lecturas)]
+
+
+def buscar_aproximada(cifra: Cifra, hechos: list[Hecho]) -> list[Hecho]:
+    """Coincidencias si la cifra está redondeada (6 % por 6,1 %; 211.000 € por 211.490 €)."""
+    candidatos = [h for h in hechos if h.es_porcentaje == cifra.es_porcentaje]
+    if cifra.es_porcentaje:
+        cercanas = [h for h in candidatos if abs(abs(h.valor) - abs(cifra.valor)) <= 0.5]
+    else:
+        cercanas = [h for h in candidatos if h.valor and abs(abs(h.valor) - abs(cifra.valor)) <= 0.01 * abs(h.valor)]
+    return sorted(cercanas, key=lambda h: abs(abs(h.valor) - abs(cifra.valor)))      # la más cercana primero
 
 
 def palabra_mas_cercana(frase: str, posicion: int, grupos: dict[str, tuple[str, ...]]) -> str | None:
@@ -162,6 +192,8 @@ def palabra_mas_cercana(frase: str, posicion: int, grupos: dict[str, tuple[str, 
                 if p == "favorable" and f[max(0, m.start() - 3):m.start()] == "des":
                     continue                                   # "desfavorable" no cuenta como "favorable"
                 d = abs(m.start() - posicion)
+                if d > DISTANCIA_CALIFICATIVO:
+                    continue                                   # demasiado lejos: probablemente habla de otra cosa
                 if distancia is None or d < distancia:
                     mejor, distancia = etiqueta, d
     return mejor
@@ -184,20 +216,30 @@ def raiz_objeto(objeto: str | None) -> str | None:
     return p[:-1] if p.endswith("s") else p            # libros -> libro
 
 
+def posiciones(texto: str, palabras) -> list[int]:
+    return [m.start() for p in palabras for m in re.finditer(re.escape(p), texto)]
+
+
 def menciona(frase: str, impulsor: dict) -> bool:
-    """La frase habla del impulsor: contiene una palabra de su tipo y el nombre de su objeto."""
+    """La frase habla del impulsor: contiene una palabra de su tipo y el nombre de su objeto,
+    CERCA la una de la otra (evita contar «plantilla de Logística... coste medio de Comercial»)."""
     f = normalizar(frase)
     claves = CLAVES_TIPO.get(impulsor["tipo"], ())
     raiz = raiz_objeto(impulsor.get("objeto"))
-    tiene_tipo = not claves or any(c in f for c in claves)
-    tiene_objeto = raiz is None or raiz in f
-    return tiene_tipo and tiene_objeto
+    pos_tipo = posiciones(f, claves) if claves else None
+    pos_objeto = posiciones(f, [raiz]) if raiz else None
+    if pos_tipo is None:                       # solo hace falta nombrar el objeto (partidas de gasto)
+        return bool(pos_objeto)
+    if pos_objeto is None:                     # solo hace falta el tipo (volumen total)
+        return bool(pos_tipo)
+    return any(abs(a - b) <= DISTANCIA_MENCION for a in pos_tipo for b in pos_objeto)
 
 
 @dataclass
 class Resultado:
     cifras_revisadas: int = 0
     no_encontradas: list = field(default_factory=list)
+    redondeadas: list = field(default_factory=list)                  # aviso: no cuenta como error
     unidad_incorrecta: list = field(default_factory=list)
     valoracion_incorrecta: list = field(default_factory=list)
     direccion_incorrecta: list = field(default_factory=list)
@@ -225,8 +267,9 @@ class Resultado:
         return len(self.impulsores_cuantificados) / self._total_impulsores if self._total_impulsores else 1.0
 
 
-def validar(texto: str, paquete: dict) -> Resultado:
-    hechos = recorrer_hechos(paquete)
+def validar(texto: str, paquete: dict, adicionales: list | None = None) -> Resultado:
+    """paquete: hechos del motor. adicionales: otras fuentes válidas de cifras (resultados de las herramientas)."""
+    hechos = recorrer_hechos(paquete) + recorrer_hechos(adicionales or [], "investigacion")
     res = Resultado()
 
     for c in extraer_cifras(texto):
@@ -234,9 +277,13 @@ def validar(texto: str, paquete: dict) -> Resultado:
         coincidencias = buscar(c, hechos)
         detalle = f"«{c.texto}» en: {c.frase}"
 
-        # Control 1: existencia
+        # Control 1: existencia (un redondeo es un aviso, no un error)
         if not coincidencias:
-            res.no_encontradas.append(detalle)
+            aproximadas = buscar_aproximada(c, hechos)
+            if aproximadas:
+                res.redondeadas.append(f"{detalle}  -> dato exacto: {aproximadas[0].valor:g}")
+            else:
+                res.no_encontradas.append(detalle)
             continue
 
         # Unidad: si el texto dice FTE, la cifra tiene que ser un dato de plantilla
@@ -292,6 +339,7 @@ def imprimir(res: Resultado) -> None:
           f"Impulsores mencionados: {res.cobertura_mencion:.0%}   "
           f"cuantificados: {res.cobertura_cuantificada:.0%}")
     secciones = [("Cifras que no están en el paquete", res.no_encontradas),
+                 ("Aviso: cifras redondeadas (no cuentan como error)", res.redondeadas),
                  ("Unidad incorrecta", res.unidad_incorrecta),
                  ("Signo invertido", res.signo_invertido),
                  ("Valoración incorrecta (favorable/desfavorable)", res.valoracion_incorrecta),

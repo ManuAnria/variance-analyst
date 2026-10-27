@@ -1,0 +1,4 @@
+fecha,modelo,prompt,informe,errores_narrativa,errores_hallazgos,mencionados,cuantificados,causas_identificadas,causas_falladas,consultas_agente,minutos
+2026-10-26 16:33,qwen2.5-14b-16k,v4,informe_qwen2.5-14b-16k_20261026_163344.md,0,0,0.91,0.91,9,S7,4,106.8
+2026-10-26 16:46,qwen2.5-14b-16k,v4,informe_qwen2.5-14b-16k_20261026_164613.md,0,0,0.91,0.91,10,,4,12.5
+2026-10-26 16:59,qwen2.5-14b-16k,v4,informe_qwen2.5-14b-16k_20261026_165942.md,2,0,0.82,0.55,10,,4,13.5
