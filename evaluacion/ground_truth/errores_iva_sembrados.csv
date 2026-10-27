@@ -1,0 +1,31 @@
+codigo,documento,libro,descripcion
+E1,FV26-00158,emitidas,Línea de libros (LIB) facturada al 21 %; los libros tributan al 4 % (art. 91.Dos.1.2º LIVA)
+E1,FV26-00414,emitidas,Línea de libros (LIB) facturada al 21 %; los libros tributan al 4 % (art. 91.Dos.1.2º LIVA)
+E1,FV26-00525,emitidas,Línea de libros (LIB) facturada al 21 %; los libros tributan al 4 % (art. 91.Dos.1.2º LIVA)
+E2,FV25-00062,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00096,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00187,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00199,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00321,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00386,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00411,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00557,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00590,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00675,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV25-00764,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV26-00014,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV26-00086,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV26-00175,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV26-00221,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV26-00267,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV26-00403,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV26-00460,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E2,FV26-00512,emitidas,Entrega intracomunitaria exenta a cliente sin NIF-IVA válido: no cumple art. 25 LIVA; debió repercutirse IVA español
+E5,FR25-00334,recibidas,IVA de atenciones a clientes deducido; no es deducible (art. 96.Uno.5º LIVA)
+E7,FR26-00178,recibidas,"Cuota de IVA no coincide con base x tipo (diferencia de 10,00 €, error de grabación)"
+E5,FR26-00209,recibidas,IVA de atenciones a clientes deducido; no es deducible (art. 96.Uno.5º LIVA)
+E3,FR25-00219,recibidas,Compra de tablets a mayorista nacional con IVA repercutido; al ser la empresa revendedora procede inversión del sujeto pasivo (art. 84.Uno.2º.g LIVA)
+E3,FR26-00047,recibidas,Compra de tablets a mayorista nacional con IVA repercutido; al ser la empresa revendedora procede inversión del sujeto pasivo (art. 84.Uno.2º.g LIVA)
+E4,FR26-00080,recibidas,Adquisición intracomunitaria sin autorrepercusión de IVA (falta 472/477) y omitida en el modelo 349
+E6,FR25-00355,recibidas,"Factura duplicada (mismo proveedor, número P06-20259471 e importe que FR25-00217); IVA deducido dos veces"
+E8,FV26-00191,modelo_303,"Modelo 303 1T 2026 presentado sin la factura FV26-00191 (cuota 2731.56 €): descuadre entre libro registro, contabilidad (saldo 4750) y declaración"

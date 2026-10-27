@@ -1,0 +1,11 @@
+codigo,desde,tipo,cuentas,direccion,descripcion
+S1,2026-06,Volumen (cliente),700,Desfavorable,Pérdida del cliente clave C001 Papelerías Mediterráneo S.A. (~12 % de ventas 2025): deja de comprar desde junio 2026. Efecto secundario: sube el precio medio (era el cliente con más descuento).
+S2,2026-04,Precio de compra,600/610 (PAP),Desfavorable,El proveedor de papel sube costes +9 % vs 2025 desde abril (presupuesto: +2 %). Margen PAP comprimido.
+S3,2026-02,Mix / volumen,"700, 600 (TEC, PAP)",Ventas favorable / margen % desfavorable,Plan de digitalización escolar: unidades TEC +30 % sobre presupuesto (categoría de margen bajo); PAP -4 %.
+S4,2026-07,Precio de venta,700 (ESC),Favorable,"Subida de tarifa de material escolar del +5 % en campaña vuelta al cole (presupuesto: +2,5 %)."
+S5,2026-05,Plantilla,640/642 (LOG),Desfavorable,Dos incorporaciones en logística adelantadas a mayo (presupuesto: septiembre).
+S6,2026-03,Tarifa,624 (LOG),Desfavorable,"Nuevo contrato de transporte: del 2,4 % al 2,8 % sobre ventas."
+S7,2026-06,Calendario (timing),627 (COM),Favorable jun / desfavorable sep,Campaña vuelta al cole presupuestada en junio (18.000 €) ejecutada en septiembre (18.600 €). Sin impacto relevante en el año.
+S8,2026-02,No recurrente,622 (LOG),Desfavorable,Reparación extraordinaria del motor de una carretilla: 6.800 € no presupuestados.
+S10,2026-01,Error de corte (cut-off),600 (OFI),Desfavorable 2026 / favorable 2025,Factura de mercaderías de Ofiarchivo Levante del 31/12/2025 contabilizada el 02/01/2026 sin periodificar: el coste cae en enero 2026 en lugar de diciembre 2025. Coste unitario OFI de enero anormalmente alto.
+S9,2026-07,Plantilla,640/642 (COM),Favorable,Baja de un comercial no cubierta (8 -> 7 FTE).
